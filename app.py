@@ -1,4 +1,4 @@
-from flask import (Flask, request, url_for, jsonify)
+from flask import (Flask, request, url_for, jsonify, render_template)
 import os
 import json
 import urllib
@@ -10,10 +10,9 @@ def make_api_query(term, course):
     base_url = 'http://data.adicu.com/courses?'
     params = urllib.urlencode({
         'api_token': app.DATA_ADICU_COM_API_KEY,
-            'term': term,
-            'course': course
-        }
-    )
+        'term': term,
+        'course': course
+    })
 
     url = base_url + params
     print url
@@ -26,14 +25,13 @@ def make_api_query(term, course):
 def hello():
     return render_template('index.html')
 
-
 @app.route('/courses.json')
 def courses():
     results = make_api_query('spring2013', 'MATHV1202')
     return jsonify(results)
 
 if __name__ == '__main__':
-    #app.debug = True
+    # app.debug = True
 
     app.DATA_ADICU_COM_API_KEY = os.environ.get('DATA_ADICU_COM_API_KEY')
 
