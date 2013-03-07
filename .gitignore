@@ -38,6 +38,4 @@ nosetests.xml
 
 ### Flask
 venv
-
-### Heroku
 .env
