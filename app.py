@@ -33,12 +33,18 @@ def courses():
     return jsonify(results)
 
 if __name__ == '__main__':
-    #app.debug = True
 
     app.DATA_ADICU_COM_API_KEY = os.environ.get('DATA_ADICU_COM_API_KEY')
 
-    # Bind to PORT if defined, otherwise default to 5000.
-    port = int(os.environ.get('PORT', 5000))
+    #  Bind to PORT if defined, otherwise default to 5000.
+    #  If PORT is not defined, assume we're running locally
+    #  and run in debug mode
+    if os.environ.get('PORT'):
+        port = int(os.environ.get('PORT'))
+    else:
+        port = 5000
+        app.debug = True
+
     app.run(host='0.0.0.0', port=port)
 
     url_for('static', filename='css/default.css')
