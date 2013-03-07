@@ -25,7 +25,7 @@ def courses():
     return jsonify(results)
 
 if __name__ == '__main__':
-    app.debug = True
+    # app.debug = True
 
     app.DATA_ADICU_COM_API_KEY = os.environ.get('DATA_ADICU_COM_API_KEY')
     
