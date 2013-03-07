@@ -28,7 +28,6 @@ if __name__ == '__main__':
     # app.debug = True
 
     app.DATA_ADICU_COM_API_KEY = os.environ.get('DATA_ADICU_COM_API_KEY')
-    print app.DATA_ADICU_COM_API_KEY
     
     # Bind to PORT if defined, otherwise default to 5000.
     port = int(os.environ.get('PORT', 5000))
