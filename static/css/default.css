@@ -1,0 +1,82 @@
+* {
+	font-family: Consolas, "Liberation Mono", Courier, monospace;
+}
+
+body {
+	color: white;
+	background: #1D1F20;
+	padding: 20px;
+	min-width: 500px;
+}
+
+#slider-explanation {
+	margin: 1em 0 1em;
+}
+
+#slider, #slider-explanation, #courses-list {
+	display: none;
+}
+
+.ui-autocomplete {
+	font-size: 100%;
+	max-height: 100px;
+	overflow-y:auto;
+	overflow-x:hidden;
+	background: #B6BAB6;
+}
+
+
+.ui-autocomplete .title {
+	color: #704D75;
+}
+.ui-autocomplete .subtitle {
+	font-size: 80%;
+}
+
+a {
+	color: #8E9546;
+	text-decoration: none;
+}
+
+#courseids {
+	width: 100%;
+}
+
+#submit {
+	border: 0;
+	background-color: white;
+	vertical-align: middle;
+}
+
+#submit:active {
+	background-color: #B6BAB6;
+}
+
+#cmd {
+	margin-bottom: 20px;
+	width: 100%;
+}
+
+#cell1 {
+	width: 100px;
+}
+
+#cell2 {
+	width: 60px;
+}
+
+#cell3 {
+	width: 60px;
+}
+
+#cell4 {
+	width: 120px;
+}
+
+#cell2, #cell3, #cell4, #cell5 {
+	padding-left: 5px;
+}
+
+#cell1, #cell2, #cell3, #cell4 {
+	padding-right: 5px;
+}

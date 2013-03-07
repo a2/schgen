@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+<head>
+	<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.1/themes/base/minified/jquery-ui.min.css" />
+	<link rel="stylesheet" href="http://cdn.jsdelivr.net/fullcalendar/1.5.4/fullcalendar.css" />
+	<link rel="stylesheet" href="static/css/normalize.min.css" />
+	<link rel="stylesheet" href="static/css/default.css" />
+	
+	<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+	<script src="http://code.jquery.com/ui/1.10.1/jquery-ui.min.js"></script>
+	<script src="http://cdn.jsdelivr.net/fullcalendar/1.5.4/fullcalendar.js"></script>
+	<script src="static/js/default.js"></script>
+</head>
+<body>
+	<table id="cmd">
+		<tbody>
+			<td id="cell1"><input type="submit" id="submit" value="$ ./schgen" /></td>
+			<td id="cell2"><label for="term">--term</label></td>
+			<td id="cell3"><select id="term"><option name="spring2013">Spring 2013</option></select></td>
+			<td id="cell4"><label for="courseids" size="50">--course-ids</label></td>
+			<td id="cell5"><input type="text" id="courseids" placeholder="MATH1202{001,002}, ENGLC1010" /></td>
+		</tbody>
+	</table>
+	
+	<p>Click and drag on the calendar to specify times during which classes should not be scheduled.</p>
+	
+	<ul id="courses-list"></ul>
+	<div id="calendar"></div>
+	
+	<div id="slider-explanation">Drag the slider to view all possible schedules.</div>
+	<div id="slider"></div>
+	
+	<div id="no-permutations-modal" title="No Schedules Possible">
+		<p>No schedules are possible with the current configuration. Try clicking on unavailable time slots to remove them.</p>
+	</div>
+</body>
+</html>
