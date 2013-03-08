@@ -1,35 +1,27 @@
-from flask import (Flask, request, url_for, jsonify)
-import os
+from flask import (Flask, request, url_for, jsonify, render_template)
 import json
-import urllib
-import urllib2
+import os
+import requests
 
 app = Flask(__name__)
 
 def make_api_query(term, course):
-    base_url = 'http://data.adicu.com/courses?'
-    params = urllib.urlencode({
+    url = 'http://data.adicu.com/courses'
+    params = {
         'api_token': app.DATA_ADICU_COM_API_KEY,
-            'term': term,
-            'course': course
-        }
-    )
-
-    url = base_url + params
-    print url
-
-    results = json.loads(urllib2.urlopen(url).read())
-    return results
-    
+        'term': term,
+        'course': course
+    }
+    results = requests.get(url, params=params)
+    return results.json()
 
 @app.route('/')
 def hello():
     return render_template('index.html')
 
-
 @app.route('/courses.json')
 def courses():
-    results = make_api_query('spring2013', 'MATHV1202')
+    results = make_api_query('spring2013', 'MATH1202')
     return jsonify(results)
 
 if __name__ == '__main__':
