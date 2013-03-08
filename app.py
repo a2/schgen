@@ -24,9 +24,11 @@ def hello():
 @app.route('/courses.json')
 def courses():
     term = request.args.get('term')
-    course = request.args.get('course')
-    results = make_api_query(term, course)
-    if term and course:
+    courses = request.args.get('courses')
+
+    if term and courses:
+        courses = courses.split(',')
+        results = {c: make_api_query(term, c) for c in courses}
         return jsonify(results)
     else:
         abort(400)  # Bad request
