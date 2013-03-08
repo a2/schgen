@@ -1,9 +1,9 @@
-from flask import (Flask, request, url_for, jsonify, render_template)
-import json
+from flask import (Flask, request, url_for, jsonify, render_template, abort)
 import os
 import requests
 
 app = Flask(__name__)
+
 
 def make_api_query(term, course):
     url = 'http://data.adicu.com/courses'
@@ -15,14 +15,21 @@ def make_api_query(term, course):
     results = requests.get(url, params=params)
     return results.json()
 
+
 @app.route('/')
 def hello():
     return render_template('index.html')
 
+
 @app.route('/courses.json')
 def courses():
-    results = make_api_query('spring2013', 'MATH1202')
-    return jsonify(results)
+    term = request.args.get('term')
+    course = request.args.get('course')
+    results = make_api_query(term, course)
+    if term and course:
+        return jsonify(results)
+    else:
+        abort(400)  # Bad request
 
 if __name__ == '__main__':
 
