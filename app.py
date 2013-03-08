@@ -1,9 +1,11 @@
 from flask import (Flask, request, url_for, jsonify, render_template, abort)
 import os
 import requests
+from colorama import Fore, Back, Style, init
 
 app = Flask(__name__)
 
+init(autoreset=True)
 
 def make_api_query(term, course):
     url = 'http://data.adicu.com/courses'
@@ -46,6 +48,7 @@ if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
 
     if os.environ.get('DEBUG'):
+        print Fore.RED, 'Running in DEBUG mode!'
         app.debug = True
 
     app.run(host='0.0.0.0', port=port)
