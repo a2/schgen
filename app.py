@@ -28,7 +28,7 @@ def courses():
 
     if term and courses:
         courses = courses.split(',')
-        results = {c: make_api_query(term, c) for c in courses}
+        results = {c: make_api_query(term, c) for c in courses if c}
         return jsonify(results)
     else:
         abort(400)  # Bad request
