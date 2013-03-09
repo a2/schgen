@@ -34,7 +34,7 @@ def courses():
 
         status_codes_OK = [v['status_code'] == 200 for v in results.values()]
         if not all(status_codes_OK):
-            abort(400)  # Internal server error
+            abort(400)  # Bad request
 
         return jsonify(results)
     else:
