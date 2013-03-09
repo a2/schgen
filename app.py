@@ -42,7 +42,7 @@ def hello():
 def courses():
     term = request.args.get('term')
     courses = request.args.get('courses')
-
+    
     if term and courses:
         courses = courses.split(',')
         results = {c: make_api_query(term, c) for c in courses if c}
@@ -58,14 +58,14 @@ def courses():
             'course_data': results,
         })
     else:
-        print 'Invalid parameters %s' % (term, courses)
+        print 'Invalid parameters %s, %s' % (term, courses)
         abort(400)  # Bad request
 
 if __name__ == '__main__':
 
     app.DATA_ADICU_COM_API_KEY = os.environ.get('DATA_ADICU_COM_API_KEY')
 
-    #  Bind to PORT if defined, otherwise default to 5000.
+    # Bind to PORT if defined, otherwise default to 5000.
     port = int(os.environ.get('PORT', 5000))
 
     if os.environ.get('DEBUG'):
