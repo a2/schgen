@@ -76,9 +76,11 @@ def courses():
             print 'API server returned errors'
             abort(400)  # Bad request
 
+        data = {k: results[k]['data'] for k in results.keys()}
+        
         return jsonify({
             'combinations': section_combinations(results),
-            'course_data': results,
+            'course_data': data,
         })
     else:
         print 'Invalid parameters term=%s, courses=%s' % (term, courses)
