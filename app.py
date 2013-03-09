@@ -80,8 +80,6 @@ def courses():
         for key in results.keys():
             data[key] = {course['Course']: course for course in results[key]['data']}
 
-        {k: results[k]['data'] for k in results.keys()}
-
         return jsonify({
             'combinations': section_combinations(results),
             'course_data': data,
