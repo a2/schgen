@@ -3,6 +3,9 @@ import os
 import requests
 from colorama import Fore, Back, Style, init
 import itertools
+import datetime
+import time
+
 
 app = Flask(__name__)
 
@@ -20,15 +23,68 @@ def make_api_query(term, course):
     return results.json()
 
 
-def section_combinations(courses):
-    sn = []
-    for c, v in courses.iteritems():
-        section_names = []
-        for i in v['data']:
-            section_names.append(i['Course'])
-        sn.append(section_names)
+def parse_meeting_times(MeetsOn1, StartTime1, EndTime1,
+                        MeetsOn2=None, StartTime2=None, EndTime2=None):
+    '''
+    Transform the course times to
+    [
+        (start_datetime1, end_datetime1),
+        (start_datetime2, end_datetime2),
+    ]
+    '''
 
-    return list(itertools.product(*sn))
+    days = 'UMTWRFS'
+
+    mt = []
+
+    for day in MeetsOn1:
+        st = time.strptime(StartTime1, '%H:%M:%S')
+        sdt = datetime.datetime(
+            year=1970,
+            month=1,
+            day=4 + days.index(day),
+            hour=st[3],
+            minute=st[4],
+            second=st[5],
+        )
+
+        et = time.strptime(EndTime1, '%H:%M:%S')
+        edt = datetime.datetime(
+            year=1970,
+            month=1,
+            day=4 + days.index(day),
+            hour=et[3],
+            minute=et[4],
+            second=et[5],
+        )
+
+        mt.append((sdt, edt))
+
+    if MeetsOn2:
+        for day in MeetsOn2:
+            st = time.strptime(StartTime2, '%H:%M:%S')
+            sdt = datetime.datetime(
+                year=1970,
+                month=1,
+                day=4 + days.index(day),
+                hour=st[3],
+                minute=st[4],
+                second=st[5],
+            )
+
+            et = time.strptime(EndTime2, '%H:%M:%S')
+            edt = datetime.datetime(
+                year=1970,
+                month=1,
+                day=4 + days.index(day),
+                hour=et[3],
+                minute=et[4],
+                second=et[5],
+            )
+
+            mt.append((sdt, edt))
+
+    return mt
 
 
 @app.route('/')
