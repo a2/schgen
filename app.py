@@ -16,6 +16,8 @@ def make_api_query(term, course):
         'term': term,
         'course': course
     }
+
+    print 'Making api query to %s' % url
     results = requests.get(url, params=params)
     return results.json()
 
@@ -48,6 +50,7 @@ def courses():
         status_codes_OK = [v['status_code'] == 200 for v in results.values()]
 
         if not all(status_codes_OK):
+            print 'API server returned errors'
             abort(400)  # Bad request
 
         return jsonify({
@@ -55,6 +58,7 @@ def courses():
             'course_data': results,
         })
     else:
+        print 'Invalid parameters %s' % (term, courses)
         abort(400)  # Bad request
 
 if __name__ == '__main__':
