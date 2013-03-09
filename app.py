@@ -9,14 +9,11 @@ app = Flask(__name__)
 init(autoreset=True)
 
 
-def make_api_query(term, course):
+def make_api_query(**kwargs):
     url = 'http://data.adicu.com/courses'
-    params = {
-        'api_token': app.DATA_ADICU_COM_API_KEY,
-        'term': term,
-        'course': course
-    }
-
+    params = kwargs
+    params['api_token'] = app.DATA_ADICU_COM_API_KEY
+    
     print 'Making api query to %s' % url
     results = requests.get(url, params=params)
     return results.json()
@@ -37,6 +34,32 @@ def section_combinations(courses):
 def hello():
     return render_template('index.html')
 
+@app.route('/search.json')
+def search():
+    term = request.args.get('term')
+    course = request.args.get('course')
+    title = request.args.get('title')
+    description = request.args.get('description')
+    
+    if term and (bool(course) + bool(title) + bool(description) == 1):
+        if course:
+            results = make_api_query(term=term, course=course)
+        elif title:
+            results = make_api_query(term=term, title=title)
+        elif description:
+            results = make_api_query(term=term, description=description)
+
+        if results['status_code'] != 200:
+            print 'API server returned errors'
+            abort(400)  # Bad request
+
+        return jsonify({
+            'results': results['data']
+        })
+    else:
+        print 'Invalid parameters term=%s, course=%s, title=%s, description=%s' \
+            % (term, course, title, description)
+        abort(400)  # Bad request
 
 @app.route('/courses.json')
 def courses():
@@ -45,7 +68,7 @@ def courses():
     
     if term and courses:
         courses = courses.split(',')
-        results = {c: make_api_query(term, c) for c in courses if c}
+        results = {c: make_api_query(term=term, course=c) for c in courses if c}
 
         status_codes_OK = [v['status_code'] == 200 for v in results.values()]
 
@@ -58,11 +81,11 @@ def courses():
             'course_data': results,
         })
     else:
-        print 'Invalid parameters %s, %s' % (term, courses)
+        print 'Invalid parameters term=%s, courses=%s' % (term, courses)
         abort(400)  # Bad request
 
 if __name__ == '__main__':
-
+    app.COLUMBIA_DAYS = "UMTWRFS"
     app.DATA_ADICU_COM_API_KEY = os.environ.get('DATA_ADICU_COM_API_KEY')
 
     # Bind to PORT if defined, otherwise default to 5000.
