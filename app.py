@@ -2,10 +2,12 @@ from flask import (Flask, request, url_for, jsonify, render_template, abort)
 import os
 import requests
 from colorama import Fore, Back, Style, init
+import itertools
 
 app = Flask(__name__)
 
 init(autoreset=True)
+
 
 def make_api_query(term, course):
     url = 'http://data.adicu.com/courses'
@@ -16,6 +18,17 @@ def make_api_query(term, course):
     }
     results = requests.get(url, params=params)
     return results.json()
+
+
+def section_combinations(courses):
+    sn = []
+    for c, v in courses.iteritems():
+        section_names = []
+        for i in v['data']:
+            section_names.append(i['Course'])
+        sn.append(section_names)
+
+    return list(itertools.product(*sn))
 
 
 @app.route('/')
@@ -33,10 +46,14 @@ def courses():
         results = {c: make_api_query(term, c) for c in courses if c}
 
         status_codes_OK = [v['status_code'] == 200 for v in results.values()]
+
         if not all(status_codes_OK):
             abort(400)  # Bad request
 
-        return jsonify(results)
+        return jsonify({
+            'combinations': section_combinations(results),
+            'course_data': results,
+        })
     else:
         abort(400)  # Bad request
 
