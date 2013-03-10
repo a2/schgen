@@ -1,0 +1,20 @@
+<h3>{{ course_id_and_title }}</h3>
+<div id="{{ course_id }}">
+	<ul>
+{% for section in sections %}
+		<li>
+			<label for="{{ section.full_id }}">
+				<input type="checkbox" id="{{ section.full_id }}" style="display:none">
+				<span class="custom checkbox checked"></span>
+				<span class="section">
+					Section {{ section.id }} with {{ section.professors }}
+					<br />
+{% for meeting in section.meetings %}
+					{{ meeting.meetsOn }} from {{ meeting.startTime }} to {{ meeting.endTime }}<br />
+{% endfor %}
+				</span>
+			</label>
+		</li>
+{% endfor %}
+	</ul>
+</div>

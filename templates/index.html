@@ -1,37 +1,74 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<!--[if IE 8]>         <html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
 <head>
-	<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.1/themes/base/minified/jquery-ui.min.css" />
-	<link rel="stylesheet" href="http://cdn.jsdelivr.net/fullcalendar/1.5.4/fullcalendar.css" />
-	<link rel="stylesheet" href="static/css/normalize.min.css" />
-	<link rel="stylesheet" href="static/css/default.css" />
-	
-	<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
-	<script src="http://code.jquery.com/ui/1.10.1/jquery-ui.min.js"></script>
-	<script src="http://cdn.jsdelivr.net/fullcalendar/1.5.4/fullcalendar.js"></script>
-	<script src="static/js/default.js"></script>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width" />
+	<title>schgen</title>
+
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/normalize.css') }}" />
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}" />
+	<link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" />
+
+	<script src="{{ url_for('static', filename='js/vendor/custom.modernizr.js') }}"></script>
 </head>
 <body>
-	<table id="cmd">
-		<tbody>
-			<td id="cell1"><input type="submit" id="submit" value="$ ./schgen" /></td>
-			<td id="cell2"><label for="term">--term</label></td>
-			<td id="cell3"><select id="term"><option name="spring2013">Spring 2013</option></select></td>
-			<td id="cell4"><label for="courseids" size="50">--course-ids</label></td>
-			<td id="cell5"><input type="text" id="courseids" placeholder="MATH1202{001,002}, ENGLC1010" /></td>
-		</tbody>
-	</table>
-	
-	<p>Click and drag on the calendar to specify times during which classes should not be scheduled.</p>
-	
-	<ul id="courses-list"></ul>
-	<div id="calendar"></div>
-	
-	<div id="slider-explanation">Drag the slider to view all possible schedules.</div>
-	<div id="slider"></div>
-	
-	<div id="no-permutations-modal" title="No Schedules Possible">
-		<p>No schedules are possible with the current configuration. Try clicking on unavailable time slots to remove them.</p>
+	<div class="row">
+		<div class="large-12 columns">
+			<h1>$ ./schgen <span id="cursor"></span></h1>
+		</div>
 	</div>
+
+	<form class="custom">
+		<div class="row">
+			<div class="large-12 columns">
+				<div class="row collapse">
+					<label for="term">Term:</label>
+					<select id="term">
+						<option name="spring2013">Spring 2013</option>
+					</select>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="large-12 columns">
+				<div class="row collapse">
+					<label for="search-box">Search for Courses:</label>
+
+					<div class="small-10 columns">
+						<input type="text" id="search-box" placeholder="Type a course title to begin&hellip;" />
+					</div>
+					<div class="small-2 columns">
+						<a href="#" id="search-button" class="button prefix">Search</a>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="large-12 columns">
+				<div id="accordion">
+
+				</div>
+			</div>
+		</div>
+	</form>
+
+	<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+	<script src="http://code.jquery.com/ui/1.10.1/jquery-ui.min.js"></script>
+	<script src="{{ url_for('static', filename='js/foundation/foundation.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/foundation/foundation.alerts.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/foundation/foundation.clearing.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/foundation/foundation.cookie.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/foundation/foundation.dropdown.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/foundation/foundation.forms.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/foundation/foundation.joyride.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/foundation/foundation.magellan.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/foundation/foundation.orbit.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/foundation/foundation.placeholder.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/foundation/foundation.reveal.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/foundation/foundation.section.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/foundation/foundation.tooltips.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/foundation/foundation.topbar.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>
 </html>
