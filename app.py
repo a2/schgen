@@ -20,9 +20,11 @@ def format_course_title(section):
 def make_api_query(**kwargs):
     url = 'http://data.adicu.com/courses'
     params = kwargs
-    params['api_token'] = app.DATA_ADICU_COM_API_KEY
     
-    print 'Making api query to %s' % url
+    #  Print this before adding API token to params to avoid printing API token
+    print 'Making api query to "%s" with params "%s"' % (url, params)
+
+    params['api_token'] = app.DATA_ADICU_COM_API_KEY
     results = requests.get(url, params=params)
     return results.json()
 
