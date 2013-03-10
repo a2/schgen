@@ -39,3 +39,7 @@ nosetests.xml
 ### Flask
 venv
 .env
+
+### SASS
+.sass-cache
+static/css/
