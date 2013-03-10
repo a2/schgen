@@ -14,6 +14,7 @@
 					success: function(data) {
 						console.log(data);
 						response(data.results);
+						$('#search-box').removeClass('loading-spinner');
 					}
 				});
 			},
@@ -33,7 +34,10 @@
 						$('#accordion').append(html)
 					}
 				})
-			}
+			},
+			search: function(event, ui) {
+				$(this).addClass('loading-spinner');
+			},
 		})
 		.data('ui-autocomplete')._renderItem = function(ul, item) {
 			return $('<li />')

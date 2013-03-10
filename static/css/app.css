@@ -5495,3 +5495,14 @@ table tfoot tr td {
     opacity: 1;
   }
 }
+
+/* line 32, ../sass/app.scss */
+#search-box {
+  background-repeat: no-repeat;
+  background-position: right center;
+}
+
+/* line 37, ../sass/app.scss */
+.loading-spinner {
+  background-image: url(/static/img/spinner_16.gif);
+}

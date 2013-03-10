@@ -28,3 +28,12 @@
 	31% { opacity: 1; }
 	100% { opacity: 1; }
 }
+
+#search-box {
+	background-repeat: no-repeat;
+	background-position: right center; 
+}
+
+.loading-spinner{
+	background-image: url(/static/img/spinner_16.gif);
+}
