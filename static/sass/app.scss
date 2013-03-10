@@ -9,3 +9,22 @@
 	font-size: 60%;
 	line-height: 125%;
 }
+
+#cursor {
+	color: #00ff00;
+	-webkit-animation-iteration-count: infinite;
+	-webkit-animation-duration: 1s;
+	-webkit-animation-name: flash-cursor;
+	-webkit-animation-timing-function: linear;
+
+	&:after {
+		content : '\258B';
+	}
+}
+
+@-webkit-keyframes flash-cursor {
+	0% { opacity: 0; }
+	30% { opacity: 0; }
+	31% { opacity: 1; }
+	100% { opacity: 1; }
+}
