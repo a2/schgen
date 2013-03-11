@@ -5539,18 +5539,17 @@ table tfoot tr td {
   background-repeat: no-repeat;
   background-position: right center;
 }
+/* line 36, ../sass/app.scss */
+#search-box.ui-autocomplete-loading {
+  background-image: url("/static/img/spinner_16.gif");
+}
 
-/* line 37, ../sass/app.scss */
+/* line 41, ../sass/app.scss */
 .course {
   -webkit-transition: background-color 0.3s linear;
   -moz-transition: background-color 0.3s linear;
   -o-transition: background-color 0.3s linear;
   transition: background-color 0.3s linear;
-}
-
-/* line 41, ../sass/app.scss */
-.loading-spinner {
-  background-image: url(/static/img/spinner_16.gif);
 }
 
 /* line 45, ../sass/app.scss */

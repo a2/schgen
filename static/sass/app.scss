@@ -31,15 +31,15 @@
 
 #search-box {
 	background-repeat: no-repeat;
-	background-position: right center; 
+	background-position: right center;
+
+	&.ui-autocomplete-loading {
+		background-image: url('/static/img/spinner_16.gif');
+	}
 }
 
 .course {
 	@include transition(background-color 0.3s linear);
-}
-
-.loading-spinner {
-	background-image: url(/static/img/spinner_16.gif);
 }
 
 footer {

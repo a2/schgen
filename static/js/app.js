@@ -8,7 +8,13 @@
 				index = selectedCourses.indexOf(id);
 			selectedCourses.splice(index, 1);
 		});
-		$('#search-box').autocomplete({
+		$('#search-box').keydown(function(event) {
+			if (event.which == 13 /* Enter/Return */)
+			{
+				$('#search-box').autocomplete('search', $('#search-box').val());
+				event.preventDefault();
+			}
+		}).autocomplete({
 			source: function(request, response) {
 				$.ajax({
 					url: '/search.json',
@@ -20,7 +26,6 @@
 					success: function(data) {
 						console.log(data);
 						response(data.results);
-						$('#search-box').removeClass('loading-spinner');
 					}
 				});
 			},
@@ -57,10 +62,7 @@
 						$('#search-box').val('');
 					}
 				})
-			},
-			search: function(event, ui) {
-				$('#search-box').addClass('loading-spinner');
-			},
+			}
 		})
 		.data('ui-autocomplete')._renderItem = function(ul, item) {
 			return $('<li />')
