@@ -1,6 +1,6 @@
-<h3>{{ course_id_and_title }}</h3>
-<div id="{{ course_id }}">
-	<ul>
+<div id="{{ course_id }}" class="course alert-box secondary radius" data-alert>
+	<h3>{{ course_id_and_title | safe }} <small><a href="#" class="close">&times;</a></small></h3>
+	<ul class="large-block-grid-3 small-block-grid-1">
 {% for section in sections %}
 		<li>
 			<label for="{{ section.full_id }}">

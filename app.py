@@ -70,7 +70,7 @@ def search():
 
                     course_ids.append(course_id)
                     data.append({
-                        'title': course_id + ' ' + title,
+                        'title': course_id + ' &bull; ' + title,
                         'subtitle': description,
                         'value': course_id
                     })
@@ -131,7 +131,7 @@ def sections():
                 course_id = re.sub("([A-Za-z ]+)([0-9 ]+)([A-Za-z])[0-9]+",
                     "\\1\\3\\2", section['Course'])
                 context['course_id'] = course_id
-                context['course_id_and_title'] = course_id + ' ' + \
+                context['course_id_and_title'] = course_id + ' &bull; ' + \
                     format_course_title(section)
 
             data = {}

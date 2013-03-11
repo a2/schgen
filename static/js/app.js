@@ -2,6 +2,12 @@
 	$(function() {
 		$(document).foundation();
 
+		var selectedCourses = [];
+		$(document).on('click', '.course.alert-box .close', function(event) {
+			var id = $(this).parents('.course').attr('id'),
+				index = selectedCourses.indexOf(id);
+			selectedCourses.splice(index, 1);
+		});
 		$('#search-box').autocomplete({
 			source: function(request, response) {
 				$.ajax({
@@ -19,10 +25,25 @@
 				});
 			},
 			focus: function(event, ui) {
-				// $('#search-box').val(ui.item.title);
 				return false;
 			},
 			select: function(event, ui) {
+				if (selectedCourses.indexOf(ui.item.value) != -1)
+				{
+					setTimeout(function() {
+						var $sect = $('#'+ui.item.value)
+							.scrollintoview({ duration: 300 })
+							.removeClass('secondary');
+
+						setTimeout(function() {
+							$sect.addClass('secondary');
+						}, 500);
+						
+						$('#search-box').val('');
+					}, 0);
+					return;
+				}
+
 				$.ajax({
 					url: '/sections.html',
 					dataType: 'html',
@@ -31,12 +52,14 @@
 						course: ui.item.value
 					},
 					success: function(html) {
-						$('#accordion').append(html)
+						$('#accordion').append(html);
+						selectedCourses.push(ui.item.value);
+						$('#search-box').val('');
 					}
 				})
 			},
 			search: function(event, ui) {
-				$(this).addClass('loading-spinner');
+				$('#search-box').addClass('loading-spinner');
 			},
 		})
 		.data('ui-autocomplete')._renderItem = function(ul, item) {
