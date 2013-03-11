@@ -12,11 +12,7 @@
 }
 
 #cursor {
-	-moz-animation: flash-cursor 1s linear 0s infinite;
-	-ms-animation: flash-cursor 1s linear 0s infinite;
-	-o-animation: flash-cursor 1s linear 0s infinite;
-	-webkit-animation: flash-cursor 1s linear 0s infinite;
-	animation: flash-cursor 1s linear 0s infinite;
+	@include experimental(animation, flash-cursor 1s linear 0s infinite);
 	color: #00ff00;
 	
 	&:after {
@@ -51,5 +47,24 @@ footer {
 		@media only screen and (max-width: emCalc(560px))  {
 			display: inline;
 		}
+	}
+}
+
+.ui-autocomplete {
+	z-index: 100;
+}
+
+#calendar {
+	.fc-agenda-slots {
+		border-right: 1px solid #CCCCCC !important;
+		margin-bottom: 0
+	}
+
+	.fc-event-content {
+		padding: 2px;
+	}
+
+	table {
+		border: none;
 	}
 }

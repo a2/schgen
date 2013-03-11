@@ -4,7 +4,7 @@
 {% for section in sections %}
 		<li>
 			<label for="{{ section.full_id }}">
-				<input type="checkbox" id="{{ section.full_id }}" style="display:none">
+				<input type="checkbox" name="{{ section.full_id }}" checked="checked" style="display:none">
 				<span class="custom checkbox checked"></span>
 				<span class="section">
 					Section {{ section.id }} with {{ section.professors }}

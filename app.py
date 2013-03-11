@@ -180,6 +180,21 @@ def sections():
         print 'Invalid parameters term=%s, course=%s' % (term, course)
         abort(400)  # Bad request
 
+@app.route('/events.json')
+def events():
+    term = request.args.get('term')
+    busy_times = request.args.get('busyTimes')
+    checkboxes = request.args.get('checkboxes')
+    if term and busy_times and checkboxes:
+        return jsonify({
+            'term': term,
+            'busyTimes': busy_times,
+            'checkboxes': checkboxes
+        })
+    else:
+        print 'Invalid parameters term=%s, busyTimes=%s, checkboxes=%s' % (term, busy_times, checkboxes)
+        return ''
+
 if __name__ == '__main__':
     app.COLUMBIA_DAYS = "UMTWRFS"
     app.COLUMBIA_DAYS_DICT = {

@@ -15,6 +15,6 @@ javascripts_dir = "static/js"
 # -----------------------------------------------
 
 # output_style = :compressed
-preferred_syntax = :sass
+preferred_syntax = :scss
 relative_assets = true
 line_comments = true
