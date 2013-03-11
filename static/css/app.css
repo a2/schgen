@@ -5552,3 +5552,18 @@ table tfoot tr td {
 .loading-spinner {
   background-image: url(/static/img/spinner_16.gif);
 }
+
+/* line 45, ../sass/app.scss */
+footer {
+  line-height: 150%;
+}
+/* line 48, ../sass/app.scss */
+footer p {
+  margin-bottom: 0;
+}
+@media only screen and (max-width: 35em) {
+  /* line 48, ../sass/app.scss */
+  footer p {
+    display: inline;
+  }
+}
