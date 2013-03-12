@@ -7,8 +7,9 @@
 }
 
 .subtitle {
-	font-size: 60%;
-	line-height: 125%;
+	display: block;
+	font-size: 75%;
+	line-height: 150%;
 }
 
 #cursor {
@@ -30,7 +31,7 @@
 	background-position: right center;
 
 	&.ui-autocomplete-loading {
-		background-image: url('/static/img/spinner_16.gif');
+		background-image: url('../img/spinner_16.gif');
 	}
 }
 
@@ -56,8 +57,12 @@ footer {
 }
 
 #calendar {
+	-moz-user-select: none;
+	-ms-user-select: none;
+	-webkit-user-select: none;
+	
 	.fc-agenda-slots {
-		border-right: 1px solid #CCCCCC !important;
+		border-right: 1px solid #ccc !important;
 		margin-bottom: 0
 	}
 
@@ -76,5 +81,19 @@ footer {
 	.nav-title {
 		padding: 3px 0;
 		text-align: center;
+	}
+}
+
+form.custom .custom.checkbox.checked:before {
+	content: '\2713';
+	font-size: 9pt;
+	padding: 2px;
+}
+
+.error a {
+	color: $alert-color;
+
+	&:hover {
+		color: darken($alert-color, 5%);
 	}
 }

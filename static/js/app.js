@@ -171,7 +171,12 @@
 				index = selectedCourses.indexOf(id);
 			selectedCourses.splice(index, 1);
 			if (selectedCourses.length == 0)
+			{
+				eventLists = {busyTimes: []};
+				calendar.fullCalendar('refetchEvents');
+				
 				$('#go').addClass('disabled');
+			}
 		}).on('click', '.select-all', function(event) {
 			event.preventDefault();
 			toggleAll(this, true);
@@ -255,7 +260,7 @@
 		})
 		.data('ui-autocomplete')._renderItem = function(ul, item) {
 			return $('<li />')
-				.append('<a><span class="title">'+item.title+'</span><br /><span class="subtitle">'+item.subtitle+'</span></a>')
+				.append('<a><span class="title">'+item.title+'</span><br />'+(item.subtitle?('<span class="subtitle">'+item.subtitle+'</span>'):'')+'</a>')
 				.appendTo(ul);
 		};
 
@@ -303,11 +308,7 @@
 					sections: checkboxes
 				},
 				success: function(data) {
-					var $alertContainer = $('#no-schedules-alert-container');
-					if ($alertContainer.is(':hidden'))
-						calendar.scrollintoview();
-					else
-						$alertContainer.scrollintoview();
+					$('.navigation').scrollintoview();
 					
 					hasSearched = true;
 					selectedEventListIndex = 0;

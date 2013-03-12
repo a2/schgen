@@ -3,7 +3,7 @@
 	<p><a href="#" class="select-all">Select All</a> &bull; <a href="#" class="deselect-all">Deselect All</a></p>
 	<ul class="large-block-grid-3 small-block-grid-1">
 {% for section in sections %}
-		<li>
+		<li{% if section.is_full %} class="error"{% endif %}>
 			<label for="{{ section.full_id }}">
 				<input type="checkbox" name="{{ section.full_id }}" id="{{ section.full_id }}" checked="checked" style="display:none">
 				<span class="custom checkbox checked"></span>

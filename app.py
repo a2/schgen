@@ -219,7 +219,8 @@ def sections():
             data['full_id'] = section['Course']
             data['bulletin_url'] = bulletin_url_for_section(section)
             data['call_number'] = section['CallNumber']
-
+            data['is_full'] = int(section['NumEnrolled']) >= int(section['MaxSize'])
+            
             professors = []
             for i in range(1, 5):
                 instructor_key = 'Instructor' + str(i) + 'Name'
@@ -359,6 +360,15 @@ def events():
                 title = format_course_title(section) + ' (#' + str(int(section_name[-3:])) + ')'
                 url = bulletin_url_for_section(section)
                 meeting_times = parse_meeting_times(section)
+
+                if int(section['NumEnrolled']) >= int(section['MaxSize']):
+                    # Class is full
+                    backgroundColor = '#CBB02B' #  '#56CB2B'
+                    borderColor = '#87751D' #  '#39871D'
+                else:
+                    backgroundColor = '#2BA6CB'
+                    borderColor = '#1D6F87'
+
                 for meeting_time in meeting_times:
                     calendar_events.append({
                         'start': meeting_time.start.isoformat(),
@@ -366,8 +376,8 @@ def events():
                         'url': url,
                         'title': title,
                         'editable': False,
-                        'backgroundColor': '#2BA6CB',
-                        'borderColor': '#1D6F87'
+                        'backgroundColor': backgroundColor,
+                        'borderColor': borderColor
                     })
 
             event_combinations.append(calendar_events)
