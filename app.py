@@ -5,8 +5,11 @@ from colorama import Fore, Back, Style, init
 import itertools
 import re
 from time import strftime, strptime
+from datetime import datetime
+from collections import namedtuple
 
 app = Flask(__name__)
+Range = namedtuple('Range', ['start', 'end'])
 
 init(autoreset=True)
 
@@ -26,16 +29,92 @@ def make_api_query(**kwargs):
     results = requests.get(url, params=params)
     return results.json()
 
-def section_combinations(courses):
+def make_fake_section_from_busy_time(busy_time):
+    return {
+        'MeetsOn1': busy_time[0:1],
+        'StartTime1': busy_time[1:6] + ':00',
+        'EndTime1': busy_time[7:12] + ':00'
+    }
+
+def parse_meeting_times(section):
+    '''
+    Transform the course times to
+    [
+        Range(start=datetime1, end=datetime1),
+        Range(start=datetime2, end=datetime2),
+        ...
+    ]
+    '''
+
+    mt = []
+
+    for i in range(1, 7):
+        meetsOn_key = 'MeetsOn' + str(i)
+        if meetsOn_key in section and section[meetsOn_key]:
+            for day in section[meetsOn_key]:
+                st = strptime(section['StartTime' + str(i)], "%H:%M:%S")
+                sdt = datetime(
+                    year=1970,
+                    month=1,
+                    day=4 + app.COLUMBIA_DAYS.index(day),
+                    hour=st[3],
+                    minute=st[4],
+                    second=st[5]
+                )
+
+                et = strptime(section['EndTime' + str(i)], "%H:%M:%S")
+                edt = datetime(
+                    year=1970,
+                    month=1,
+                    day=4 + app.COLUMBIA_DAYS.index(day),
+                    hour=et[3],
+                    minute=et[4],
+                    second=et[5]
+                )
+
+                mt.append(Range(start=sdt, end=edt))
+
+    return mt
+
+def section_combinations(courses, in_api_format=True):
     sn = []
     for c, v in courses.iteritems():
         section_names = []
-        for i in v['data']:
-            section_names.append(i['Course'])
+        if in_api_format:
+            for i in v['data']:
+                section_names.append(i['Course'])
+        else:
+            for i in v:
+                section_names.append(v[i]['Course'])
+
         sn.append(section_names)
 
     return list(itertools.product(*sn))
 
+def ranges_overlap(range1, range2):
+    latest_start = max(range1.start, range2.start)
+    earliest_end = min(range1.end, range2.end)
+    dt = earliest_end - latest_start
+    if dt.days * 86400 + dt.seconds > 0:
+        return True   # Ranges overlap
+    else:
+        return False  # Ranges don't overlap
+
+def sections_conflict(section1, section2):
+    for i in range(1, 7):
+        mt1 = parse_meeting_times(section1)
+        mt2 = parse_meeting_times(section2)
+        iter = itertools.product(mt1, mt2)
+        for a, b in iter:
+            if ranges_overlap(a, b):
+                return True
+
+    return False
+
+def bulletin_url_for_section(section):
+    trailing_part = re.sub("([A-Za-z ]+)([0-9 ]+)([A-Za-z]+)([0-9]+)",
+        "\\1/\\3\\2-"+section['Term']+"-\\4", section['Course'])
+    return 'http://www.columbia.edu/cu/bulletin/uwb/subj/' + trailing_part
 
 @app.route('/')
 def hello():
@@ -138,7 +217,9 @@ def sections():
             data['id'] = int(re.sub("[A-Za-z ]+[0-9 ]+[A-Za-z]([0-9]+)",
                 "\\1", section['Course']))
             data['full_id'] = section['Course']
-            
+            data['bulletin_url'] = bulletin_url_for_section(section)
+            data['call_number'] = section['CallNumber']
+
             professors = []
             for i in range(1, 5):
                 instructor_key = 'Instructor' + str(i) + 'Name'
@@ -183,16 +264,100 @@ def sections():
 @app.route('/events.json')
 def events():
     term = request.args.get('term')
-    busy_times = request.args.get('busyTimes')
-    checkboxes = request.args.get('checkboxes')
-    if term and busy_times and checkboxes:
-        return jsonify({
-            'term': term,
-            'busyTimes': busy_times,
-            'checkboxes': checkboxes
-        })
+    busy_times = request.args.getlist('busyTimes[]')
+    sections = request.args.getlist('sections[]')
+
+    if term and len(sections):
+        if len(busy_times):
+            busy_times = [make_fake_section_from_busy_time(busy_time) for busy_time in busy_times]
+        
+        courses = {}
+        for section in sections:
+            course_id = section[:-3];
+            if course_id in courses:
+                course_list = courses[course_id];
+            else:
+                course_list = []
+                courses[course_id] = course_list
+            course_list.append(section)
+
+        results = {c: make_api_query(term=term,
+            course=c) for c in courses.keys() if c}
+
+        status_codes_OK = [v['status_code'] == 200 for v in results.values()]
+
+        if not all(status_codes_OK):
+            print 'API server returned errors'
+            return ''
+
+        # Filter out undesired sections
+        data = {}
+        for key in results.keys():
+            data[key] = {course['Course']: course for course in results[key]['data'] if course['Course'] in courses[course['Course'][:-3]]}
+
+        # Filter out conflicting combinations of classes
+        valid_combinations = []
+        for combination in section_combinations(data, False):
+            is_valid = True
+            if len(busy_times):
+                for section_name, busy_time in itertools.product(combination, busy_times):
+                    section = data[section_name[:-3]][section_name]
+                    if sections_conflict(section, busy_time):
+                        print section['Course'] + " conflicts with " + str(busy_time)
+                        is_valid = False
+                        break
+
+                if not is_valid:
+                    continue
+
+            for a, b in itertools.combinations(combination, 2):
+                if sections_conflict(a, b):
+                    print a['Course'] + " conflicts with " + b['Course']
+                    is_valid = False
+                    break
+
+            if is_valid:
+                print str(combination) + 'is valid'
+                valid_combinations.append(combination)
+
+        busy_time_events = []
+        event_combinations = []
+        events = {
+            'busyTimes': busy_time_events,
+            'eventLists': event_combinations
+        }
+
+        if len(busy_times):
+            for bt_section in busy_times:
+                mt = parse_meeting_times(bt_section)[0]
+                busy_time_events.append({
+                    'start': mt.start.isoformat(),
+                    'end': mt.end.isoformat(),
+                    'title': 'Unavailable'
+                })
+
+        for combination in valid_combinations:
+            calendar_events = []
+            for section_name in combination:
+                section = data[section_name[:-3]][section_name]
+                title = format_course_title(section) + ' (#' + str(int(section_name[-3:])) + ')'
+                url = bulletin_url_for_section(section)
+                meeting_times = parse_meeting_times(section)
+                for meeting_time in meeting_times:
+                    calendar_events.append({
+                        'start': meeting_time.start.isoformat(),
+                        'end': meeting_time.end.isoformat(),
+                        'url': url,
+                        'title': title,
+                        'editable': False,
+                        'backgroundColor': '#3366CC'
+                    })
+
+            event_combinations.append(calendar_events)
+
+        return jsonify(events)
     else:
-        print 'Invalid parameters term=%s, busyTimes=%s, checkboxes=%s' % (term, busy_times, checkboxes)
+        print 'Invalid parameters term=%s, busyTimes=%s, sections=%s' % (term, busy_times, sections)
         return ''
 
 if __name__ == '__main__':

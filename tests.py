@@ -1,12 +1,14 @@
 import unittest
-
 from app import *
-
 
 class testApp(unittest.TestCase):
 
     def test_parse_meeting_times(self):
-        i = ['M', '12:00:20', '18:00:00']
+        i = {
+            'MeetsOn1': 'M',
+            'StartTime1': '12:00:20',
+            'EndTime1': '18:00:00'
+        }
         expected = [(
             datetime.datetime(
                 year=1970,
@@ -24,10 +26,14 @@ class testApp(unittest.TestCase):
                 second=0,)
         )]
 
-        result = parse_meeting_times(*i)
+        result = parse_meeting_times(i)
         self.assertEqual(expected, result)
 
-        i = ['MS', '12:00:20', '18:00:00']
+        i = {
+            'MeetsOn1': 'MS',
+            'StartTime1': '12:00:20',
+            'EndTime1': '18:00:00'
+        }
         expected = [
             (
                 datetime.datetime(
@@ -51,10 +57,17 @@ class testApp(unittest.TestCase):
             )
         ]
 
-        result = parse_meeting_times(*i)
+        result = parse_meeting_times(i)
         self.assertEqual(expected, result)
 
-        i = ['M', '12:00:20', '18:00:00', 'R', '00:10:00', '14:30:00']
+        i = {
+            'MeetsOn1': 'M',
+            'StartTime1': '12:00:20',
+            'EndTime1': '18:00:00',
+            'MeetsOn2': 'R',
+            'StartTime2': '00:10:00',
+            'EndTime2': '14:30:00'
+        }
         expected = [
             (
                 datetime.datetime(
