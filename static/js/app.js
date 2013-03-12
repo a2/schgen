@@ -39,7 +39,7 @@
 			selectable: true,
 			selectHelper: true,
 			contentHeight: 1500,
-			eventBackgroundColor: '#CC3D3D',
+			eventBackgroundColor: '#CB502B',
 			select: function(start, end, allDay) {
 				calendar.fullCalendar('renderEvent', {
 					title: "Unavailable",
