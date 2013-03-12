@@ -349,7 +349,8 @@ def events():
                         'url': url,
                         'title': title,
                         'editable': False,
-                        'backgroundColor': '#2BA6CB'
+                        'backgroundColor': '#2BA6CB',
+                        'borderColor': '#1D6F87'
                     })
 
             event_combinations.append(calendar_events)
