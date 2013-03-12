@@ -5592,15 +5592,7 @@ footer p {
   margin-bottom: 1em;
 }
 /* line 76, ../sass/app.scss */
-.navigation .nav-prev {
-  text-align: right;
-}
-/* line 80, ../sass/app.scss */
 .navigation .nav-title {
   padding: 3px 0;
   text-align: center;
-}
-/* line 85, ../sass/app.scss */
-.navigation .nav-next {
-  text-align: left;
 }
