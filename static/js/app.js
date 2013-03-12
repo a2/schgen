@@ -89,7 +89,7 @@
 			},
 			eventClick: function(calendarEvent) {
 				if (calendarEvent.url) {
-					window.open(event.url);r
+					window.open(calendarEvent.url);
 					return false;
 				}
 
