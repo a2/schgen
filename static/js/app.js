@@ -18,6 +18,42 @@
 					return calendarEvent;
 			});
 		}
+
+		function calendarEventDidUpdate(calendarEvent, dayDelta, minuteDelta) {
+			var start = calendarEvent.start,
+				end = calendarEvent.end;
+
+			function trimStart() {
+				start = new Date(end.getTime());
+				start.setHours(8);
+				start.setMinutes(0);
+
+				calendarEvent.start = start;
+				calendar.fullCalendar('updateEvent', calendarEvent);
+			}
+
+			function trimEnd() {
+				end = new Date(start.getTime());
+				end.setHours(22);
+				end.setMinutes(0);
+				
+				calendarEvent.end = end;
+				calendar.fullCalendar('updateEvent', calendarEvent);
+			}
+
+			if (start.getDay() != end.getDay()) {
+				if (minuteDelta > 0) {
+					trimEnd();
+				} else {
+					trimStart()
+				}
+			}
+			else if (start.getHours() < 8)
+				trimStart();
+			else if (end.getHours() > 22 || (end.getHours() == 22 && end.getMinutes() > 0))
+				trimEnd();
+		}
+
 		calendar.fullCalendar({
 			events: function(start, end, callback) {
 				var events = eventLists.busyTimes;
@@ -67,42 +103,11 @@
 				updateBusyTimes();
 			},
 			eventDrop: function(calendarEvent, dayDelta, minuteDelta, allDay, revertFunc, jsEvent, ui, view ) {
-				var start = calendarEvent.start,
-					end = calendarEvent.end;
-
-				function trimStart() {
-					start = new Date(end.getTime());
-					start.setHours(8);
-					start.setMinutes(0);
-
-					calendarEvent.start = start;
-					calendar.fullCalendar('updateEvent', calendarEvent);
-				}
-
-				function trimEnd() {
-					end = new Date(start.getTime());
-					end.setHours(22);
-					end.setMinutes(0);
-					
-					calendarEvent.end = end;
-					calendar.fullCalendar('updateEvent', calendarEvent);
-				}
-
-				if (start.getDay() != end.getDay()) {
-					if (minuteDelta > 0) {
-						trimEnd();
-					} else {
-						trimStart()
-					}
-				}
-				else if (start.getHours() < 8)
-					trimStart();
-				else if (end.getHours() > 22 || (end.getHours() == 22 && end.getMinutes() > 0))
-					trimEnd();
-
+				calendarEventDidUpdate(calendarEvent, dayDelta, minuteDelta);
 				updateBusyTimes();
 			},
 			eventResize: function(calendarEvent, dayDelta, minuteDelta, revertFunc, jsEvent, ui, view) {
+				calendarEventDidUpdate(calendarEvent, dayDelta, minuteDelta);
 				updateBusyTimes();
 			}
 		});
@@ -124,8 +129,6 @@
 
 			$('.nav-title').text(length ? ("Schedule " + (selectedEventListIndex + 1) + " / " + length) : "No Schedules");
 			
-			console.log(selectedEventListIndex, length);
-
 			if (selectedEventListIndex == 0)
 				prev.addClass('disabled');
 			else
@@ -169,7 +172,6 @@
 			event.preventDefault();
 			toggleAll(this, false);
 		}).on('keydown', function(event) {
-			console.log(event);
 			var w = event.which || event.keyCode;
 			if (w == $.ui.keyCode.LEFT) {
 				$('.nav-prev .button').click();
