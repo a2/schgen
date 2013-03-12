@@ -25,7 +25,7 @@ def make_api_query(**kwargs):
     params = kwargs
     params['api_token'] = app.DATA_ADICU_COM_API_KEY
     
-    print 'Making api query to %s' % url
+    print 'Making API query to %s' % url
     results = requests.get(url, params=params)
     return results.json()
 
@@ -303,7 +303,6 @@ def events():
                 for section_name, busy_time in itertools.product(combination, busy_times):
                     section = data[section_name[:-3]][section_name]
                     if sections_conflict(section, busy_time):
-                        print section['Course'] + " conflicts with " + str(busy_time)
                         is_valid = False
                         break
 
@@ -312,12 +311,10 @@ def events():
 
             for a, b in itertools.combinations(combination, 2):
                 if sections_conflict(a, b):
-                    print a['Course'] + " conflicts with " + b['Course']
                     is_valid = False
                     break
 
             if is_valid:
-                print str(combination) + 'is valid'
                 valid_combinations.append(combination)
 
         busy_time_events = []
