@@ -179,6 +179,9 @@
 			event.preventDefault();
 			toggleAll(this, false);
 		}).on('keydown', function(event) {
+			if ($(':focus').length)
+				return;
+
 			var w = event.which || event.keyCode;
 			if (w == $.ui.keyCode.LEFT) {
 				$('.nav-prev .button').click();
@@ -238,13 +241,12 @@
 						course: ui.item.value
 					},
 					success: function(html) {
-						var $section = $(html);
-						$('#accordion').append($section);
-						$section.scrollintoview();
+						$('#accordion').append(html);
+						var $go = $('#go').scrollintoview();
 
 						selectedCourses.push(ui.item.value);
 						if (selectedCourses.length)
-							$('#go').removeClass('disabled');
+							$go.removeClass('disabled');
 
 						$('#search-box').val('');
 					}
@@ -267,7 +269,7 @@
 			event.preventDefault();
 
 			function pad(num) {
-				return num.toString().pad(2, "0");
+				return ((num < 10) ? "0" : "") + num;
 			}
 			function timeString(date) {
 				return pad(date.getHours()) + ":" + pad(date.getMinutes());
@@ -315,42 +317,3 @@
 		});
 	});
 })(jQuery, this);
-
-/* 
- * To Title Case 2.0.1 – http://individed.com/code/to-title-case/
- * Copyright © 2008–2012 David Gouch. Licensed under the MIT License. 
- */
-
-String.prototype.toTitleCase = function () {
-  var smallWords = /^(a|an|and|as|at|but|by|en|for|if|in|of|on|or|the|to|vs?\.?|via)$/i;
-
-  return this.replace(/([^\W_]+[^\s-]*) */g, function (match, p1, index, title) {
-	if (index > 0 && index + p1.length !== title.length &&
-	  p1.search(smallWords) > -1 && title.charAt(index - 2) !== ":" && 
-	  title.charAt(index - 1).search(/[^\s-]/) < 0) {
-	  return match.toLowerCase();
-	}
-
-	if (p1.substr(1).search(/[A-Z]|\../) > -1) {
-	  return match;
-	}
-
-	return match.charAt(0).toUpperCase() + match.substr(1);
-  });
-};
-
-// http://jsfromhell.com/string/pad
-//
-// String.pad(length: Integer, [substring: String = " "], [type: Integer = 0]): String
-// Returns the string with a substring padded on the left, right or both sides.
-//
-// length: amount of characters that the string must have
-// substring: string that will be concatenated
-// type: specifies the side where the concatenation will happen, where:
-//		   0 = left, 1 = right and 2 = both sides
-
-String.prototype.pad = function(l, s, t){
-	return s || (s = " "), (l -= this.length) > 0 ? (s = new Array(Math.ceil(l / s.length)
-		+ 1).join(s)).substr(0, t = !t ? l : t == 1 ? 0 : Math.ceil(l / 2))
-		+ this + s.substr(0, l - t) : this;
-};
