@@ -5555,51 +5555,52 @@ table tfoot tr td {
 /* line 41, ../sass/app.scss */
 footer {
   line-height: 150%;
+  padding-bottom: 1em;
 }
-/* line 44, ../sass/app.scss */
+/* line 45, ../sass/app.scss */
 footer p {
   margin-bottom: 0;
 }
 @media only screen and (max-width: 35em) {
-  /* line 44, ../sass/app.scss */
+  /* line 45, ../sass/app.scss */
   footer p {
     display: inline;
   }
 }
 
-/* line 53, ../sass/app.scss */
+/* line 54, ../sass/app.scss */
 .ui-autocomplete {
   z-index: 100;
 }
 
-/* line 58, ../sass/app.scss */
+/* line 59, ../sass/app.scss */
 #calendar .fc-agenda-slots {
   border-right: 1px solid #cccccc !important;
   margin-bottom: 0;
 }
-/* line 63, ../sass/app.scss */
+/* line 64, ../sass/app.scss */
 #calendar .fc-event-content {
   padding: 2px;
 }
-/* line 67, ../sass/app.scss */
+/* line 68, ../sass/app.scss */
 #calendar table {
   border: none;
 }
 
-/* line 72, ../sass/app.scss */
+/* line 73, ../sass/app.scss */
 .navigation {
   margin-bottom: 1em;
 }
-/* line 75, ../sass/app.scss */
+/* line 76, ../sass/app.scss */
 .navigation .nav-prev {
   text-align: right;
 }
-/* line 79, ../sass/app.scss */
+/* line 80, ../sass/app.scss */
 .navigation .nav-title {
   padding: 3px 0;
   text-align: center;
 }
-/* line 84, ../sass/app.scss */
+/* line 85, ../sass/app.scss */
 .navigation .nav-next {
   text-align: left;
 }
