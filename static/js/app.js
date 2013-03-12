@@ -116,6 +116,44 @@
 			$section.find('input[type=checkbox]').prop('checked', !!checked);
 		}
 
+		function updateNavigationTitle() {
+			var length = eventLists.eventLists ? eventLists.eventLists.length : 0,
+				prev = $('.nav-prev .button'),
+				next = $('.nav-next .button');
+
+			$('.nav-title').text(length ? ("Schedule " + (selectedEventListIndex + 1) + " / " + length) : "No Schedules");
+			
+			console.log(selectedEventListIndex, length);
+
+			if (selectedEventListIndex == 0)
+				prev.addClass('disabled');
+			else
+				prev.removeClass('disabled');
+
+			if (length == 0 || selectedEventListIndex == length - 1)
+				next.addClass('disabled');
+			else
+				next.removeClass('disabled');
+		}
+		updateNavigationTitle();
+
+		$('.nav-prev .button').click(function(event) {
+			event.preventDefault();
+			if ($(this).hasClass('disabled'))
+				return;
+			selectedEventListIndex--;
+			updateNavigationTitle();
+			calendar.fullCalendar('refetchEvents');
+		});
+		$('.nav-next .button').click(function(event) {
+			event.preventDefault();
+			if ($(this).hasClass('disabled'))
+				return;
+			selectedEventListIndex++;
+			updateNavigationTitle();
+			calendar.fullCalendar('refetchEvents');
+		});
+
 		var selectedCourses = [];
 		$(document).on('click', '.course.alert-box .close', function(event) {
 			var id = $(this).parents('.course').attr('id'),
@@ -129,10 +167,19 @@
 		}).on('click', '.deselect-all', function(event) {
 			event.preventDefault();
 			toggleAll(this, false);
+		}).on('keydown', function(event) {
+			console.log(event);
+			var w = event.which || event.keyCode;
+			if (w == $.ui.keyCode.LEFT) {
+				$('.nav-prev .button').click();
+			} else if (w == $.ui.keyCode.RIGHT) {
+				$('.nav-next .button').click();
+			}
 		});
 
 		$('#search-box').keydown(function(event) {
-			if (event.which == $.ui.keyCode.ENTER)
+			var w = event.which || event.keyCode;
+			if (w == $.ui.keyCode.ENTER)
 			{
 				$('#search-box').autocomplete('search', $('#search-box').val());
 				event.preventDefault();
@@ -191,12 +238,12 @@
 
 						$('#search-box').val('');
 					}
-				})
+				});
 			}
 		})
 		.data('ui-autocomplete')._renderItem = function(ul, item) {
 			return $('<li />')
-				.append(['<a><span class="title">', item.title, '</span><br /><span class="subtitle">', item.subtitle, '</span></a>'].join(''))
+				.append('<a><span class="title">'+item.title+'</span><br /><span class="subtitle">'+item.subtitle+'</span></a>')
 				.appendTo(ul);
 		};
 
@@ -242,8 +289,11 @@
 					sections: checkboxes
 				},
 				success: function(data) {
+					calendar.scrollintoview();
+					selectedEventListIndex = 0;
 					eventLists = data;
 					calendar.fullCalendar('refetchEvents');
+					updateNavigationTitle();
 				}
 			});
 		});
@@ -259,17 +309,17 @@ String.prototype.toTitleCase = function () {
   var smallWords = /^(a|an|and|as|at|but|by|en|for|if|in|of|on|or|the|to|vs?\.?|via)$/i;
 
   return this.replace(/([^\W_]+[^\s-]*) */g, function (match, p1, index, title) {
-    if (index > 0 && index + p1.length !== title.length &&
-      p1.search(smallWords) > -1 && title.charAt(index - 2) !== ":" && 
-      title.charAt(index - 1).search(/[^\s-]/) < 0) {
-      return match.toLowerCase();
-    }
+	if (index > 0 && index + p1.length !== title.length &&
+	  p1.search(smallWords) > -1 && title.charAt(index - 2) !== ":" && 
+	  title.charAt(index - 1).search(/[^\s-]/) < 0) {
+	  return match.toLowerCase();
+	}
 
-    if (p1.substr(1).search(/[A-Z]|\../) > -1) {
-      return match;
-    }
+	if (p1.substr(1).search(/[A-Z]|\../) > -1) {
+	  return match;
+	}
 
-    return match.charAt(0).toUpperCase() + match.substr(1);
+	return match.charAt(0).toUpperCase() + match.substr(1);
   });
 };
 
@@ -281,10 +331,10 @@ String.prototype.toTitleCase = function () {
 // length: amount of characters that the string must have
 // substring: string that will be concatenated
 // type: specifies the side where the concatenation will happen, where:
-//           0 = left, 1 = right and 2 = both sides
+//		   0 = left, 1 = right and 2 = both sides
 
 String.prototype.pad = function(l, s, t){
-    return s || (s = " "), (l -= this.length) > 0 ? (s = new Array(Math.ceil(l / s.length)
-        + 1).join(s)).substr(0, t = !t ? l : t == 1 ? 0 : Math.ceil(l / 2))
-        + this + s.substr(0, l - t) : this;
+	return s || (s = " "), (l -= this.length) > 0 ? (s = new Array(Math.ceil(l / s.length)
+		+ 1).join(s)).substr(0, t = !t ? l : t == 1 ? 0 : Math.ceil(l / 2))
+		+ this + s.substr(0, l - t) : this;
 };

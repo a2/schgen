@@ -5585,3 +5585,21 @@ footer p {
 #calendar table {
   border: none;
 }
+
+/* line 72, ../sass/app.scss */
+.navigation {
+  margin-bottom: 1em;
+}
+/* line 75, ../sass/app.scss */
+.navigation .nav-prev {
+  text-align: right;
+}
+/* line 79, ../sass/app.scss */
+.navigation .nav-title {
+  padding: 3px 0;
+  text-align: center;
+}
+/* line 84, ../sass/app.scss */
+.navigation .nav-next {
+  text-align: left;
+}

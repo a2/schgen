@@ -310,7 +310,9 @@ def events():
                     continue
 
             for a, b in itertools.combinations(combination, 2):
-                if sections_conflict(a, b):
+                section_a = data[a[:-3]][a]
+                section_b = data[b[:-3]][b]
+                if sections_conflict(section_a, section_b):
                     is_valid = False
                     break
 

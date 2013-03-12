@@ -68,3 +68,20 @@ footer {
 		border: none;
 	}
 }
+
+.navigation {
+	margin-bottom: 1em;
+
+	.nav-prev {
+		text-align: right;
+	}
+
+	.nav-title {
+		padding: 3px 0;
+		text-align: center;
+	}
+
+	.nav-next {
+		text-align: left;
+	}
+}
