@@ -19,7 +19,7 @@
 			});
 		}
 
-		function calendarEventDidUpdate(calendarEvent, dayDelta, minuteDelta) {
+		function calendarEventDidUpdate(calendarEvent, minuteDelta) {
 			var start = calendarEvent.start,
 				end = calendarEvent.end;
 
@@ -103,11 +103,11 @@
 				updateBusyTimes();
 			},
 			eventDrop: function(calendarEvent, dayDelta, minuteDelta, allDay, revertFunc, jsEvent, ui, view ) {
-				calendarEventDidUpdate(calendarEvent, dayDelta, minuteDelta);
+				calendarEventDidUpdate(calendarEvent, minuteDelta);
 				updateBusyTimes();
 			},
 			eventResize: function(calendarEvent, dayDelta, minuteDelta, revertFunc, jsEvent, ui, view) {
-				calendarEventDidUpdate(calendarEvent, dayDelta, minuteDelta);
+				calendarEventDidUpdate(calendarEvent, minuteDelta);
 				updateBusyTimes();
 			}
 		});
@@ -122,12 +122,19 @@
 			$section.find('input[type=checkbox]').prop('checked', !!checked);
 		}
 
+		var hasSearched = false;
 		function updateNavigationTitle() {
 			var length = eventLists.eventLists ? eventLists.eventLists.length : 0,
 				prev = $('.nav-prev .button'),
 				next = $('.nav-next .button');
 
-			$('.nav-title').text(length ? ("Schedule " + (selectedEventListIndex + 1) + " / " + length) : "No Schedules");
+			if (length == 0) {
+				$('.nav-title').text("No Schedules");
+				if (hasSearched) $('#no-schedules-alert-container').removeClass('hide');
+			} else {
+				$('.nav-title').text("Schedule " + (selectedEventListIndex + 1) + " / " + length);
+				$('#no-schedules-alert-container').addClass('hide');
+			}
 			
 			if (selectedEventListIndex == 0)
 				prev.addClass('disabled');
@@ -292,7 +299,13 @@
 					sections: checkboxes
 				},
 				success: function(data) {
-					calendar.scrollintoview();
+					var $alertContainer = $('#no-schedules-alert-container');
+					if ($alertContainer.is(':hidden'))
+						calendar.scrollintoview();
+					else
+						$alertContainer.scrollintoview();
+					
+					hasSearched = true;
 					selectedEventListIndex = 0;
 					eventLists = data;
 					calendar.fullCalendar('refetchEvents');
