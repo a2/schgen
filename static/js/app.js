@@ -56,10 +56,10 @@
 
 		calendar.fullCalendar({
 			events: function(start, end, callback) {
-				var events = eventLists.busyTimes;
 				if (eventLists.eventLists && selectedEventListIndex < eventLists.eventLists.length)
-					events = events.concat(eventLists.eventLists[selectedEventListIndex]);
-				callback(events);
+					callback(eventLists.eventLists[selectedEventListIndex]);
+				else
+					callback([]);
 			},
 			defaultView: 'agendaWeek',
 			header: null,
@@ -282,7 +282,9 @@
 				return;
 
 			events = $.map(events, function(calendarEvent, i) {
-				return calendarEvent.url ? null : [columbiaDays[calendarEvent.start.getDay()]+timeString(calendarEvent.start)+"-"+timeString(calendarEvent.end)];
+				var start = new Date(calendarEvent.start),
+					end = new Date(calendarEvent.end);
+				return calendarEvent.url ? null : [columbiaDays[start.getDay()]+timeString(start)+"-"+timeString(end)];
 			});
 
 			checkboxes = $.map(checkboxes, function(element) {

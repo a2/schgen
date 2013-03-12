@@ -296,15 +296,20 @@ def events():
             data[key] = {course['Course']: course for course in results[key]['data'] if course['Course'] in courses[course['Course'][:-3]]}
 
         # Filter out conflicting combinations of classes
+        all_combinations = section_combinations(data, False)
+        combinations_busy_time_conflicts = [0] * len(busy_times)
         valid_combinations = []
-        for combination in section_combinations(data, False):
+        for i in range(len(all_combinations)):
+            combination = all_combinations[i]
+            
             is_valid = True
             if len(busy_times):
-                for section_name, busy_time in itertools.product(combination, busy_times):
+                for section_name, busy_time_i in itertools.product(combination, range(len(busy_times))):
+                    busy_time = busy_times[busy_time_i]
                     section = data[section_name[:-3]][section_name]
                     if sections_conflict(section, busy_time):
+                        combinations_busy_time_conflicts[busy_time_i] += 1
                         is_valid = False
-                        break
 
                 if not is_valid:
                     continue
@@ -319,6 +324,7 @@ def events():
             if is_valid:
                 valid_combinations.append(combination)
 
+        print combinations_busy_time_conflicts
         busy_time_events = []
         event_combinations = []
         events = {
@@ -326,17 +332,28 @@ def events():
             'eventLists': event_combinations
         }
 
-        if len(busy_times):
-            for bt_section in busy_times:
-                mt = parse_meeting_times(bt_section)[0]
-                busy_time_events.append({
-                    'start': mt.start.isoformat(),
-                    'end': mt.end.isoformat(),
-                    'title': 'Unavailable'
-                })
-
+        first_combination = True
         for combination in valid_combinations:
             calendar_events = []
+
+            if len(busy_times):
+                for i in range(len(busy_times)):
+                    bt_section = busy_times[i]
+                    mt = parse_meeting_times(bt_section)[0]
+                    event = {
+                        'start': mt.start.isoformat(),
+                        'end': mt.end.isoformat(),
+                        'title': 'Unavailable'
+                    }
+                    if first_combination:
+                        busy_time_events.append(event)
+
+                    event = event.copy()
+                    event['title'] += ' (' + str(combinations_busy_time_conflicts[i]) + ')'
+                    calendar_events.append(event)
+
+                first_combination = False
+
             for section_name in combination:
                 section = data[section_name[:-3]][section_name]
                 title = format_course_title(section) + ' (#' + str(int(section_name[-3:])) + ')'
