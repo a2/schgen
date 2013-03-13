@@ -75,14 +75,17 @@
 			selectable: true,
 			selectHelper: true,
 			contentHeight: 1500,
-			eventBackgroundColor: '#CB502B',
-			eventBorderColor: '#87351D',
+			eventBackgroundColor: '#fff',
+			eventBorderColor: '#E6E6E6',
 			select: function(start, end, allDay) {
 				calendar.fullCalendar('renderEvent', {
 					title: "Unavailable",
 					start: start,
 					end: end,
-					allDay: allDay
+					allDay: allDay,
+					backgroundColor: '#fff',
+					borderColor: '#E6E6E6',
+					textColor: '#000'
 				}, false).fullCalendar('unselect');
 
 				updateBusyTimes();
@@ -305,7 +308,8 @@
 				data: {
 					term: $("#term :checked").attr('name'),
 					busyTimes: events,
-					sections: checkboxes
+					sections: checkboxes,
+					courses: selectedCourses
 				},
 				success: function(data) {
 					$('.navigation').scrollintoview();

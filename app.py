@@ -7,6 +7,7 @@ import re
 from time import strftime, strptime
 from datetime import datetime
 from collections import namedtuple
+import math
 
 app = Flask(__name__)
 Range = namedtuple('Range', ['start', 'end'])
@@ -267,8 +268,11 @@ def events():
     term = request.args.get('term')
     busy_times = request.args.getlist('busyTimes[]')
     sections = request.args.getlist('sections[]')
+    courses_array = request.args.getlist('courses[]')
 
-    if term and len(sections):
+    if term and len(sections) and len(courses_array):
+        courses_array = [re.sub("\\b([A-Za-z ]{4})([A-Za-z])([0-9 ]+)\\b", "\\1\\3\\2", course) for course in courses_array]
+
         if len(busy_times):
             busy_times = [make_fake_section_from_busy_time(busy_time) for busy_time in busy_times]
         
@@ -325,7 +329,6 @@ def events():
             if is_valid:
                 valid_combinations.append(combination)
 
-        print combinations_busy_time_conflicts
         busy_time_events = []
         event_combinations = []
         events = {
@@ -355,20 +358,33 @@ def events():
 
                 first_combination = False
 
+            non_full_classes = []
             for section_name in combination:
-                section = data[section_name[:-3]][section_name]
+                course_name = section_name[:-3]
+                section = data[course_name][section_name]
+                if int(section['NumEnrolled']) < int(section['MaxSize']):
+                    non_full_classes.append(course_name)
+
+            full_classes_iterated = 0
+            for section_name in combination:
+                course_name = section_name[:-3]
+
+                section = data[course_name][section_name]
                 title = format_course_title(section) + ' (#' + str(int(section_name[-3:])) + ')'
                 url = bulletin_url_for_section(section)
                 meeting_times = parse_meeting_times(section)
 
                 if int(section['NumEnrolled']) >= int(section['MaxSize']):
                     # Class is full
-                    backgroundColor = '#CBB02B' #  '#56CB2B'
-                    borderColor = '#87751D' #  '#39871D'
+                    backgroundColor = "#1A1A1A"
+                    borderColor = "#000"
+                    full_classes_iterated += 1
                 else:
-                    backgroundColor = '#2BA6CB'
-                    borderColor = '#1D6F87'
-
+                    i = non_full_classes.index(course_name)
+                    hue = str(math.fmod(360.0 / len(non_full_classes) * i + 14.0, 360.0))
+                    backgroundColor = "hsl(" + hue + ", 65%, 48%)"
+                    borderColor = "hsl(" + hue + ", 65%, 38%)"
+                
                 for meeting_time in meeting_times:
                     calendar_events.append({
                         'start': meeting_time.start.isoformat(),
@@ -384,7 +400,7 @@ def events():
 
         return jsonify(events)
     else:
-        print 'Invalid parameters term=%s, busyTimes=%s, sections=%s' % (term, busy_times, sections)
+        print 'Invalid parameters term=%s, busyTimes=%s, sections=%s, courses=%s' % (term, busy_times, sections, courses_array)
         return ''
 
 if __name__ == '__main__':
