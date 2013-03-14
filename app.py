@@ -8,6 +8,8 @@ from time import strftime, strptime
 from datetime import datetime
 from collections import namedtuple
 import math
+import postgres
+import courses as coursesdb
 
 app = Flask(__name__)
 Range = namedtuple('Range', ['start', 'end'])
@@ -117,6 +119,9 @@ def bulletin_url_for_section(section):
         "\\1/\\3\\2-"+section['Term']+"-\\4", section['Course'])
     return 'http://www.columbia.edu/cu/bulletin/uwb/subj/' + trailing_part
 
+def fix_course_name(course_name):
+    return re.sub("\\b([A-Za-z ]{4})([A-Za-z])([0-9 ]+)\\b", "\\1\\3\\2", course_name)
+
 @app.route('/')
 def hello():
     return render_template('index.html')
@@ -127,7 +132,7 @@ def search():
     query = request.args.get('query')
     
     if term and query:
-        query = re.sub("\\b([A-Za-z ]{4})([A-Za-z])([0-9 ]+)\\b", "\\1\\3\\2", query)
+        query = fix_course_name(query)
 
         data = []
         course_ids = []
@@ -170,8 +175,7 @@ def courses():
     if term and courses:
         courses = courses.split(',')
         results = {c: make_api_query(term=term,
-            course=re.sub("\\b([A-Za-z ]{4})([A-Za-z])([0-9 ]+)\\b",
-            "\\1\\3\\2", c)) for c in courses if c}
+            course=fix_course_name(c)) for c in courses if c}
 
         status_codes_OK = [v['status_code'] == 200 for v in results.values()]
 
@@ -197,7 +201,7 @@ def sections():
     course = request.args.get('course')
     
     if term and course:
-        course = re.sub("\\b([A-Za-z ]{4})([A-Za-z])([0-9 ]+)\\b", "\\1\\3\\2", course)
+        course = fix_course_name(course)
         results = make_api_query(term=term, course=course)
 
         if results['status_code'] != 200:
@@ -271,7 +275,7 @@ def events():
     courses_array = request.args.getlist('courses[]')
 
     if term and len(sections) and len(courses_array):
-        courses_array = [re.sub("\\b([A-Za-z ]{4})([A-Za-z])([0-9 ]+)\\b", "\\1\\3\\2", course) for course in courses_array]
+        courses_array = [fix_course_name(course) for course in courses_array]
 
         if len(busy_times):
             busy_times = [make_fake_section_from_busy_time(busy_time) for busy_time in busy_times]
