@@ -2,6 +2,8 @@
 import argparse
 import simplejson as json
 from postgres import pg_sync
+import requests
+import os
 
 schema = [
     ("Term", "varchar(32)"),
@@ -193,32 +195,40 @@ def _typify(value, data_type):
     else:
         return None
 
-def load_data(dump_file):
+def load_data_from_json(json_data):
     pg = pg_sync()
     query_queue = []
+    for course in json_data:
+        pairs = [(name, _typify(course[name], data_type)) for (name,
+                data_type) in schema if name not in special_fields]
+        pairs += _special_treatment(course, schema)
+        [columns, values] = zip(*pairs)
+        db_query = 'INSERT INTO courses_t (%s) VALUES (%s);' % (
+                ', '.join(columns), ', '.join(["%s"] * len(values)))
+        query_queue.append(values)
+        if len(query_queue) == 1000:
+            print 'submitting a batch'
+            cursor = pg.cursor()
+            cursor.executemany(db_query, query_queue)
+            pg.commit()
+            cursor.close()
+            query_queue = []
+    if query_queue:
+        print 'submitting a batch'
+        cursor = pg.cursor()
+        cursor.executemany(db_query, query_queue)
+        pg.commit()
+        cursor.close()
+        query_queue = []
+
+def load_data_from_file(dump_file):
     with open(dump_file) as f:
-         for course in json.load(f):
-             pairs = [(name, _typify(course[name], data_type)) for (name,
-                     data_type) in schema if name not in special_fields]
-             pairs += _special_treatment(course, schema)
-             [columns, values] = zip(*pairs)
-             db_query = 'INSERT INTO courses_t (%s) VALUES (%s);' % (
-                     ', '.join(columns), ', '.join(["%s"] * len(values)))
-             query_queue.append(values)
-             if len(query_queue) == 1000:
-                 print 'submitting a batch'
-                 cursor = pg.cursor()
-                 cursor.executemany(db_query, query_queue)
-                 pg.commit()
-                 cursor.close()
-                 query_queue = []
-         if query_queue:
-             print 'submitting a batch'
-             cursor = pg.cursor()
-             cursor.executemany(db_query, query_queue)
-             pg.commit()
-             cursor.close()
-             query_queue = []
+        load_data_from_json(json.load(f))
+
+def load_data_from_cuit():
+    url = os.environ.get('COURSES_DATA_JSON_URL')
+    r = requests.get(url)
+    load_data_from_json(r.json())
 
 def main():
     parser = argparse.ArgumentParser(description="""Read a directory of courses
@@ -227,14 +237,15 @@ def main():
             courses_t table if it doesn't already exist""")
     parser.add_argument('--drop', action='store_true', help="""drop the
             courses_t table""")
-    parser.add_argument('dump_file')
+    parser.add_argument('--load', action='store_true', help="""load courses data
+            from CUIT""")
     args = parser.parse_args()
     if args.create:
         create_table()
     elif args.drop:
         drop_table()
-    else:
-        load_data(args.dump_file)
+    elif args.load:
+        load_data_from_cuit()
 
 if __name__ == "__main__":
     main()
