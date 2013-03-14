@@ -348,7 +348,8 @@ def events():
                     event = {
                         'start': mt.start.isoformat(),
                         'end': mt.end.isoformat(),
-                        'title': 'Unavailable'
+                        'title': 'Unavailable',
+                        'textColor': 'black'
                     }
                     if first_combination:
                         busy_time_events.append(event)
