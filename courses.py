@@ -303,11 +303,11 @@ def main():
     parser.add_argument('--load', action='store_true', help="""load courses data
             from CUIT""")
     args = parser.parse_args()
+    if args.drop:
+        drop_table()
     if args.create:
         create_table()
-    elif args.drop:
-        drop_table()
-    elif args.load:
+    if args.load:
         load_data_from_cuit()
 
 if __name__ == "__main__":
