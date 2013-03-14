@@ -4,6 +4,8 @@ import simplejson as json
 from postgres import pg_sync
 import requests
 import os
+import model
+import model_functions
 
 schema = [
     ("Term", "varchar(32)"),
@@ -229,6 +231,67 @@ def load_data_from_cuit():
     url = os.environ.get('COURSES_DATA_JSON_URL')
     r = requests.get(url)
     load_data_from_json(r.json())
+
+def valid_query_arguments():
+    return [func for func in dir(model_functions) if not "__" in func]
+
+def get_recognized_arguments(accepted_queries, **kwargs):
+    queries = {query: kwargs[query]
+        for query in accepted_queries if query in kwargs}
+    return queries
+
+def attr_func_wrap(key, value):
+    func = getattr(model_functions, key)
+    value, fragment = func(value)
+    return key, value, fragment
+
+def build_sql_query(arguments):
+    # We have a dict of query keys and values and call getattr with the key,
+    # which returns a function pointer with the name of "key", which we call, which
+    # provides a query fragment that function makes
+    
+    # slug is a list, each with (key, value, query_fragment)
+    slug = [attr_func_wrap(key, value) for key, value in
+            arguments.iteritems()]
+    query_fragments = [fragment for _, _, fragment in slug]
+    modified_arguments = {key: value for key, value, _ in slug}
+    sql_query_fragments = {
+        "select_body": ", ".join(model.SELECT),
+        "table": model.TABLE,
+        "query_fragments": " AND ".join(query_fragments),
+        "order_by" : model.ORDERBY,
+    }
+
+    query = "SELECT %(select_body)s FROM %(table)s WHERE %(query_fragments)s ORDER BY %(order_by)s;" % sql_query_fragments
+    
+    return query, modified_arguments
+
+def api_response(data, status_code=200, status_txt="OK"):
+    return dict(data=data, status_code=status_code, status_txt=status_txt)
+
+def error(status_code, status_txt, data=None):
+    return api_response(status_code=status_code, status_txt=status_txt, data=data)
+
+def finish(response):
+    if response:
+        return api_response(response)
+    else:
+        return error(status_code=204, status_txt="NO_CONTENT_FOR_REQUEST")
+
+def on_sql_response(cursor):
+    response = [model.build_response_dict(row) for row in cursor.fetchall()]
+    return finish(response)
+
+def query_database(**kwargs):
+    pg = pg_sync()
+    recognized_arguments = valid_query_arguments()
+    queries = get_recognized_arguments(recognized_arguments, **kwargs)
+    if not queries:
+        return error(status_code=400, status_txt="MISSING_QUERY_ARGUMENTS")
+    query, arguments = build_sql_query(queries)
+    cursor = pg.cursor()
+    cursor.execute(query, arguments)
+    return on_sql_response(cursor)
 
 def main():
     parser = argparse.ArgumentParser(description="""Read a directory of courses

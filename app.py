@@ -24,16 +24,9 @@ def format_course_title(section):
     return replace_roman_numerals(section['CourseTitle'].title())
 
 def make_api_query(**kwargs):
-    url = 'http://data.adicu.com/courses'
-    params = kwargs
-    
-    # Print this before adding API token to params to avoid printing API token
-    print 'Making api query to "%s" with params "%s"' % (url, params)
-
-    params['api_token'] = app.DATA_ADICU_COM_API_KEY
-
-    results = requests.get(url, params=params)
-    return results.json()
+    print 'Querying with params %s', kwargs
+    results = coursesdb.query_database(**kwargs)
+    return results
 
 def make_fake_section_from_busy_time(busy_time):
     return {
@@ -143,7 +136,7 @@ def search():
         for criterion in ['course', 'title', 'description']:
             kwargs = {'term': term, criterion: query}
             results = make_api_query(**kwargs)
-
+            
             if results['status_code'] != 200:
                 continue
 
