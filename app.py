@@ -133,10 +133,11 @@ def search():
         data = []
         course_ids = []
 
-        for criterion in ['course', 'title', 'description']:
+        # for criterion in ['course', 'title', 'description']:
+        for criterion in ['course', 'title']:
             kwargs = {'term': term, criterion: query}
             results = make_api_query(**kwargs)
-            
+
             if results['status_code'] != 200:
                 continue
 
