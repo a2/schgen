@@ -8,8 +8,6 @@ from time import strftime, strptime
 from datetime import datetime
 from collections import namedtuple
 import math
-import postgres
-import courses as coursesdb
 
 app = Flask(__name__)
 Range = namedtuple('Range', ['start', 'end'])
@@ -24,9 +22,16 @@ def format_course_title(section):
     return replace_roman_numerals(section['CourseTitle'].title())
 
 def make_api_query(**kwargs):
-    print 'Querying with params %s', kwargs
-    results = coursesdb.query_database(**kwargs)
-    return results
+    url = 'http://data.adicu.com/courses'
+    params = kwargs
+    
+    # Print this before adding API token to params to avoid printing API token
+    print 'Making api query to "%s" with params "%s"' % (url, params)
+ 
+    params['api_token'] = app.DATA_ADICU_COM_API_KEY
+ 
+    results = requests.get(url, params=params)
+    return results.json()
 
 def make_fake_section_from_busy_time(busy_time):
     return {
@@ -133,8 +138,7 @@ def search():
         data = []
         course_ids = []
 
-        # for criterion in ['course', 'title', 'description']:
-        for criterion in ['course', 'title']:
+        for criterion in ['course', 'title', 'description']:
             kwargs = {'term': term, criterion: query}
             results = make_api_query(**kwargs)
 
